@@ -1,36 +1,149 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Photo Gallery Application
 
-## Getting Started
+Une application Next.js permettant aux utilisateurs de s'authentifier, visualiser et liker des images provenant de l'API Unsplash.
 
-First, run the development server:
+## 🚀 Fonctionnalités
 
+- ✨ Authentification utilisateur
+- 📸 Galerie d'images avec défilement infini
+- ❤️ Système de likes
+- 🔒 Gestion des sessions avec JWT
+- 📱 Design responsive
+
+## 🛠️ Technologies Utilisées
+
+- [Next.js](https://nextjs.org/) - Framework React
+- [Level](https://github.com/Level/level) - Base de données
+- [Unsplash API](https://unsplash.com/developers) - API d'images
+- [Tailwind CSS](https://tailwindcss.com/) - Framework CSS
+- [JWT](https://jwt.io/) - Gestion des tokens d'authentification
+
+## 📋 Prérequis
+
+- Node.js (version 16 ou supérieure)
+- npm ou yarn
+- Un compte développeur Unsplash avec une clé API
+
+## ⚙️ Installation
+
+1. Clonez le repository
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/mohammeddl/gallery-app.git
+cd gallery-app
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Installez les dépendances
+```bash
+npm install
+# ou
+yarn install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Créez un fichier `.env.local` à la racine du projet avec les variables suivantes :
+```env
+NEXT_PUBLIC_UNSPLASH_ACCESS_KEY=votre_clé_api_unsplash
+JWT_SECRET=votre_secret_jwt
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. Démarrez le serveur de développement
+```bash
+npm run dev
+# ou
+yarn dev
+```
 
-## Learn More
+L'application sera accessible à l'adresse : `http://localhost:3000`
 
-To learn more about Next.js, take a look at the following resources:
+## 🔐 Authentification
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+L'application dispose de trois comptes de test :
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Utilisateur | Mot de passe | Statut |
+|------------|--------------|---------|
+| muser1     | mpassword1   | Actif   |
+| muser2     | mpassword2   | Actif   |
+| muser3     | mpassword3   | Bloqué  |
 
-## Deploy on Vercel
+## 🔄 API Endpoints
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Authentication
+- `POST /api/auth`
+  - Corps : `{ username: string, password: string }`
+  - Retourne : `{ token: string }` ou une erreur
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Likes
+- `GET /api/likes/:imageId`
+  - Headers : `Authorization: Bearer <token>`
+  - Retourne : `{ isLiked: boolean }`
+
+- `POST /api/likes/:imageId`
+  - Headers : `Authorization: Bearer <token>`
+  - Retourne : `{ success: true }`
+
+- `DELETE /api/likes/:imageId`
+  - Headers : `Authorization: Bearer <token>`
+  - Retourne : `{ success: true }`
+
+## 📁 Structure du Projet
+
+```
+/gallery-app
+  /.env.local
+  /app
+    /api
+      /auth
+        route.js
+      /likes
+        /[imageId]
+          route.js
+    /components
+      AuthForm.js
+      ImageGrid.js
+      LikeButton.js
+    /gallery
+      page.js
+    /login
+      page.js
+    page.js
+  /middleware.js
+```
+
+## 🚀 Déploiement
+
+1. Construisez l'application :
+```bash
+npm run build
+# ou
+yarn build
+```
+
+2. Démarrez en production :
+```bash
+npm start
+# ou
+yarn start
+```
+
+## 📝 Notes de Développement
+
+- La base de données Level est utilisée pour stocker les likes des utilisateurs
+- L'authentification utilise JWT pour la gestion des sessions
+- Le défilement infini est implémenté avec l'Intersection Observer API
+- Les images sont chargées depuis l'API Unsplash avec pagination
+
+## 🤝 Contribution
+
+1. Fork le projet
+2. Créez votre branche (`git checkout -b feature/AmazingFeature`)
+3. Committez vos changements (`git commit -m 'Add some AmazingFeature'`)
+4. Push vers la branche (`git push origin feature/AmazingFeature`)
+5. Ouvrez une Pull Request
+
+## 📄 Licence
+
+Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de détails.
+
+## 👥 Contact
+
+
+Lien du projet : [https://github.com/mohammeddl/gallery-app](https://github.com/mohammeddl/gallery-app)
