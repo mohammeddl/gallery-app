@@ -1,4 +1,3 @@
-// app/login/page.tsx
 'use client';
 
 import React, { useState, FormEvent } from 'react';
@@ -18,7 +17,6 @@ const LoginPage = () => {
       setLoading(true);
   
       try {
-        // Nettoyer l'identifiant
         const username = identifier.includes('@') 
           ? identifier.split('@')[0] 
           : identifier;

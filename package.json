@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "better-sqlite3": "^11.8.1",
     "gallery-app": "file:",
     "jsonwebtoken": "^9.0.2",
     "level": "^9.0.0",
@@ -19,6 +20,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@types/better-sqlite3": "^7.6.12",
     "@types/jsonwebtoken": "^9.0.8",
     "@types/node": "^20.17.19",
     "@types/react": "^19",

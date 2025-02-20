@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { verifyToken } from '../lib/auth';
+import { verifyToken } from '../app/lib/auth';
 
 export const config = {
   matcher: ['/gallery/:path*', '/api/likes/:path*']
