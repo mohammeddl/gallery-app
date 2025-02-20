@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import LikeButton from '../components/LikeButton';
 
 interface UnsplashImage {
   id: string;
@@ -16,12 +18,22 @@ interface UnsplashImage {
 }
 
 const GalleryPage = () => {
+  const router = useRouter();
   const [images, setImages] = useState<UnsplashImage[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const imagesPerPage = 12;
+
+  useEffect(() => {
+    // Check authentication
+    const token = localStorage.getItem('token');
+    if (!token) {
+      router.push('/login');
+      return;
+    }
+  }, [router]);
 
   useEffect(() => {
     fetchImages(currentPage);
@@ -48,7 +60,6 @@ const GalleryPage = () => {
       const newImages = await response.json();
       setImages(newImages);
       
-      // Get total count from headers
       const totalCount = Number(response.headers.get('x-total'));
       setTotalPages(Math.ceil(totalCount / imagesPerPage));
     } catch (err) {
@@ -59,86 +70,22 @@ const GalleryPage = () => {
     }
   };
 
-  const handlePageChange = (newPage: number) => {
-    if (newPage >= 1 && newPage <= totalPages) {
-      setCurrentPage(newPage);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  };
-
-  const renderPagination = () => {
-    const pages = [];
-    let startPage = Math.max(1, currentPage - 2);
-    let endPage = Math.min(totalPages, startPage + 4);
-
-    if (endPage - startPage < 4) {
-      startPage = Math.max(1, endPage - 4);
-    }
-
-    for (let i = startPage; i <= endPage; i++) {
-      pages.push(
-        <button
-          key={i}
-          onClick={() => handlePageChange(i)}
-          className={`px-4 py-2 mx-1 rounded-md ${
-            currentPage === i
-              ? 'bg-gray-900 text-white'
-              : 'bg-white text-gray-700 hover:bg-gray-100'
-          }`}
-        >
-          {i}
-        </button>
-      );
-    }
-
-    return (
-      <div className="flex items-center justify-center mt-8 space-x-2">
-        <button
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-          className="p-2 rounded-md bg-white text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <ChevronLeft className="w-5 h-5" />
-        </button>
-        {startPage > 1 && (
-          <>
-            <button
-              onClick={() => handlePageChange(1)}
-              className="px-4 py-2 rounded-md bg-white text-gray-700 hover:bg-gray-100"
-            >
-              1
-            </button>
-            {startPage > 2 && <span className="px-2">...</span>}
-          </>
-        )}
-        {pages}
-        {endPage < totalPages && (
-          <>
-            {endPage < totalPages - 1 && <span className="px-2">...</span>}
-            <button
-              onClick={() => handlePageChange(totalPages)}
-              className="px-4 py-2 rounded-md bg-white text-gray-700 hover:bg-gray-100"
-            >
-              {totalPages}
-            </button>
-          </>
-        )}
-        <button
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-          className="p-2 rounded-md bg-white text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <ChevronRight className="w-5 h-5" />
-        </button>
-      </div>
-    );
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    router.push('/login');
   };
 
   return (
     <div className="min-h-screen bg-gray-100">
       <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
           <h1 className="text-3xl font-bold text-gray-900">Photo Gallery</h1>
+          <button
+            onClick={handleLogout}
+            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+          >
+            Logout
+          </button>
         </div>
       </header>
 
@@ -153,15 +100,16 @@ const GalleryPage = () => {
           {images.map((image) => (
             <div
               key={image.id}
-              className="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:shadow-lg hover:-translate-y-1"
+              className="bg-white rounded-lg shadow-md overflow-hidden relative"
             >
-              <div className="relative pb-[100%]">
+              <div className="aspect-square relative">
                 <img
                   src={image.urls.regular}
                   alt={image.alt_description || 'Unsplash photo'}
                   className="absolute inset-0 w-full h-full object-cover"
                   loading="lazy"
                 />
+                <LikeButton imageId={image.id} />
               </div>
               <div className="p-4">
                 <p className="text-sm text-gray-600">
@@ -177,7 +125,25 @@ const GalleryPage = () => {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
           </div>
         ) : (
-          renderPagination()
+          <div className="flex justify-center mt-8 space-x-4">
+            <button
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="p-2 rounded-md bg-white disabled:opacity-50"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <span className="p-2">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className="p-2 rounded-md bg-white disabled:opacity-50"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
         )}
       </main>
     </div>
